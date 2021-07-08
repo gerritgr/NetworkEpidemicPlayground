@@ -5,7 +5,7 @@ Testing Streamlit for Epidemic-type Spreading Processes on Contact Networks
 
 Accessible online @ https://share.streamlit.io/gerritgr/networkepidemicplayground/main/app.py
 
-### How to run
+### How to run offline
 ```console
 pip install -r requirements.txt
 streamlit run app.py
