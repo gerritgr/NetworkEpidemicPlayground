@@ -14,4 +14,5 @@ streamlit run app.py
 ![example gif](example.gif "Example")
 
 
+Example of generated GIF:
 ![animation gif](animation.gif "Animation")
