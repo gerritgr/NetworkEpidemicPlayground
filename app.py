@@ -10,8 +10,12 @@ import os, imageio, glob, time
 
 """
 # Network Epidemic Playground
-Continuous-time stochastic simulation of epidemic spreading on human-to-human contact networks:
+### Continuous-time stochastic simulation of epidemic spreading on human-to-human contact networks.
 """
+
+st.markdown("![Animation](https://github.com/gerritgr/NetworkEpidemicPlayground/blob/main/animation.gif?raw=true)")
+
+st.markdown("This tools lets you play around with epidemic-type processes on contact networks. For better performace, run the tool locally (see [Github](https://github.com/gerritgr/NetworkEpidemicPlayground)).")
 
 
 def colors():
