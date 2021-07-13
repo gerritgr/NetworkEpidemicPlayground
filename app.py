@@ -52,18 +52,18 @@ elif option_model == 'Corona model':
     st.markdown(f'States: `S,E,I1,I2,I3,R,V,D`')
     states_eval = ["S", "E", "I1", "I2", "I3", "R", "V", "D"]
 
-    r1 = st.slider('I1+S->I1+E', min_value=0.0, max_value=20.0, value=0.5, key='CH_r1')
-    r2 = st.slider('I2+S->I2+E', min_value=0.0, max_value=20.0, value=0.5, key='CH_r2')
-    r3 = st.slider('I3+S->I3+E', min_value=0.0, max_value=20.0, value=0.5, key='CH_r3')
+    r1 = st.slider('I1+S->I1+E', min_value=0.0, max_value=1.0, value=0.15, key='CH_r1')
+    r2 = st.slider('I2+S->I2+E', min_value=0.0, max_value=1.0, value=0.05, key='CH_r2')
+    r3 = st.slider('I3+S->I3+E', min_value=0.0, max_value=1.0, value=0.05, key='CH_r3')
 
-    r4 = st.slider('E->I1', min_value=0.0, max_value=20.0, value=0.5, key='CH_r4')
-    r5 = st.slider('I1->I2', min_value=0.0, max_value=20.0, value=0.5, key='CH_r5')
-    r6 = st.slider('I2->I3', min_value=0.0, max_value=20.0, value=0.5, key='CH_r6')
-    r7 = st.slider('I3->D', min_value=0.0, max_value=20.0, value=0.5, key='CH_r7')
+    r4 = st.slider('E->I1', min_value=0.0, max_value=1.0, value=1.0/5.0, key='CH_r4')
+    r5 = st.slider('I1->I2', min_value=0.0, max_value=1.0, value=0.2/6.0, key='CH_r5')
+    r6 = st.slider('I2->I3', min_value=0.0, max_value=1.0, value=0.25/6.0, key='CH_r6')
+    r7 = st.slider('I3->D', min_value=0.0, max_value=0.01, value=0.02/8.0, key='CH_r7')
 
-    r8 = st.slider('I1->R', min_value=0.0, max_value=20.0, value=0.5, key='CH_r8')
-    r9 = st.slider('I2->R', min_value=0.0, max_value=20.0, value=0.5, key='CH_r9')
-    r10 = st.slider('I3->R', min_value=0.0, max_value=20.0, value=0.5, key='CH_10')
+    r8 = st.slider('I1->R', min_value=0.0, max_value=1.0, value=0.8/6.0, key='CH_r8')
+    r9 = st.slider('I2->R', min_value=0.0, max_value=1.0, value=0.75/6.0, key='CH_r9')
+    r10 = st.slider('I3->R', min_value=0.0, max_value=1.0, value=0.98/8.0, key='CH_10')
 
     rules_eval = [(("I1", "S"), ("I1", "E"), float(r1)), (("I2", "S"), ("I2", "E"), float(r2)),
                   (("I3", "S"), ("I3", "E"), float(r3)), ("E", "I1", float(r4)), ("I1", "I2", float(r5)),
@@ -95,13 +95,13 @@ pos = None
 if option_network == 'Karate':
     G = nx.karate_club_graph()
     edges = list(G.edges)
-    st.markdown('Edges: `{}`'.format(repr(edges)))
+    #st.markdown('Edges: `{}`'.format(repr(edges)))
 elif option_network == '2D-Grid':
     dim = st.slider('Dimension', min_value=1.0, max_value=10.0, value=5.0, step=1.0, key='2d_dim')
     dim = int(dim)
     G = nx.grid_2d_graph(dim, dim)
     edges = list(G.edges)
-    st.markdown('Edges: `{}`'.format(repr(edges)))
+    #st.markdown('Edges: `{}`'.format(repr(edges)))
 elif option_network == 'Geometric':
     nodenum = st.slider('Node-Num', min_value=1.0, max_value=300.0, value=200.0, step=1.0, key='nodenum')
     density = st.slider('Density', min_value=0.01, max_value=0.5, value=0.125, key='density')
@@ -109,7 +109,7 @@ elif option_network == 'Geometric':
     G = nx.random_geometric_graph(nodenum, density, seed=42)
     edges = list(G.edges)
     pos = {i: G.nodes[i]['pos'] for i in G.nodes()}
-    st.markdown('Edges: `{}`'.format(repr(edges)))
+    #st.markdown('Edges: `{}`'.format(repr(edges)))
 else:
     edgelist_text = (
     [(0, 4), (0, 1), (1, 5), (1, 2), (2, 6), (2, 3), (3, 7), (4, 8), (4, 5), (5, 9), (5, 6), (6, 10), (6, 7), (7, 11),
@@ -148,7 +148,10 @@ node_num = G.number_of_nodes()
 
 states_slider = dict()
 for s in states_eval:
-    x = st.slider('Init Number ' + str(s), min_value=0.0, max_value=float(node_num), value=1.0, step=1.0,
+    value = 1.0
+    if s == 'S':
+        value = G.number_of_nodes() - len(states_eval) + 1.0
+    x = st.slider('Init Number ' + str(s), min_value=0.0, max_value=float(node_num), value=value, step=1.0,
                   key='init_' + str(s) + str(node_num))
     states_slider[s] = x
 
