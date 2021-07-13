@@ -6,6 +6,7 @@ import pandas as pd
 from simulation import *
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os, imageio, glob, time
 
 """
 # Network Epidemic Playground
@@ -127,7 +128,7 @@ if G.number_of_nodes() < 251:
     # ax.scatter([1,2,3],[1,2,3])
     if pos is None:
         pos = nx.spring_layout(G, seed=42)
-    nx.draw(G, pos=pos, node_color='black', edgelist=list(), alpha=0.5, linewidths=0.0)
+    nx.draw(G, pos=pos, node_color='black', edgelist=list(), alpha=0.5, linewidths=0.0, node_size = 1.0 / G.number_of_nodes() * 200 * 70)
     nx.draw(G, pos=pos, node_color='black', nodelist=list())
     st.write(fig, width=0.5)
 
@@ -212,20 +213,20 @@ if click_run or 'chart_data' in st.session_state or click_gif:
     current_labels_dict = {n: current_labels[n] for n in range(len(current_labels))}
 
     if G.number_of_nodes() < 251:
+        plt.close()
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        colordict = colors()#{'S': 'yellow', 'I': 'red', 'R': 'green'}
+        colordict = colors() #{'S': 'yellow', 'I': 'red', 'R': 'green'}
         colorlist = [colordict.get(l, 'black') for l in current_labels]
-        nx.draw(G, pos=pos, edgelist=list(), alpha=1.0, linewidths=0.0, labels=current_labels_dict, font_color='gray',
-                node_color=colorlist)
-        nx.draw(G, pos=pos, node_color='black', nodelist=list())
+        nx.draw(G, pos=pos, edgelist=list(), alpha=0.9, linewidths=0.0, labels=current_labels_dict, font_color='gray',
+                node_color=colorlist, node_size = 1.0 / G.number_of_nodes() * 200 * 70)
+        nx.draw(G, pos=pos, edge_color='black', nodelist=list(), alpha=0.5)
         st.write(fig, width=0.5)
 
-    click_gif = st.button('Create Gif', key='creategif')
+    click_gif = st.button('Create Gif (takes a while)', key='creategif')
     if click_gif:
-        import os, imageio, glob
-
         os.system('rm -rf imagedata')
+        time.sleep(0.01)
         os.system('mkdir imagedata')
         node_size = 1.0 / G.number_of_nodes() * 200 * 70
 
@@ -235,18 +236,47 @@ if click_run or 'chart_data' in st.session_state or click_gif:
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
             colordict = colors()  # {'S': 'yellow', 'I': 'red', 'R': 'green'}
+            #legend
+            for state in states_eval:
+                c = colordict.get(state, 'black')
+                plt.plot([0, 0.0001], [0, 0.0001], label=state, c=c, lw=3)  # todo make invsible (better)
+                plt.plot([0, 0.0001], [0, 0.0001], c='white', lw=4)  # todo make invsible (better)
+
             colorlist = [colordict.get(l, 'black') for l in current_labels]
             nx.draw(G, pos=pos, edgelist=list(), alpha=0.8, linewidths=0.0,  # labels=current_labels_dict,
                     font_color='gray', node_color=colorlist, node_size=node_size, width=0.8)
             nx.draw(G, pos=pos, edge_color='black', nodelist=list(), alpha=0.5)
-            plt.savefig('imagedata/labels_' + str(i).zfill(7) + '.png')
-            with imageio.get_writer('movie.gif', mode='I', fps=2.0) as writer:
-                for filename in sorted(glob.glob('imagedata/*.png')):
+            plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left", frameon=False)
+            plt.savefig('imagedata/labels_' + str(i).zfill(7) + '.png', bbox_inches='tight', dpi=300)
+
+        time.sleep(0.1)
+        image_filepath = "movie_{}.gif".format(int(random.random()*10000))
+        with imageio.get_writer(image_filepath, fps=3.0) as writer:
+            for filename in sorted(glob.glob('imagedata/*.png')):
+                try:
                     image = imageio.imread(filename)
                     writer.append_data(image)
+                except:
+                    print('Image load error')
 
         # st.markdown("![Alt Text](./movie.gif)")
-        st.image("movie.gif")
+        time.sleep(0.1)
+        st.write(image_filepath)
+        #st.image(image_filepath)
+        #st.image(image_filepath)
+
+        import base64
+        #https://discuss.streamlit.io/t/how-to-show-local-gif-image/3408/3
+        """### Animation """
+        file_ = open(image_filepath, "rb")
+        contents = file_.read()
+        data_url = base64.b64encode(contents).decode("utf-8")
+        file_.close()
+
+        st.markdown(
+            f'<img src="data:image/gif;base64,{data_url}" alt="animation">',
+            unsafe_allow_html=True,
+        )
 
     #
 # st.graphviz_chart('''
