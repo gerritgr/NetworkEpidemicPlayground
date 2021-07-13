@@ -15,4 +15,5 @@ streamlit run app.py
 
 
 Example of generated GIF:
+
 ![animation gif](animation.gif "Animation")
