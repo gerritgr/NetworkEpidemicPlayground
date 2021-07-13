@@ -12,3 +12,6 @@ streamlit run app.py
 ```
 
 ![example gif](example.gif "Example")
+
+
+![animation gif](animation.gif "Animation")
